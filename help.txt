@@ -1,0 +1,8 @@
+ if (sqr[0]["text"] == sqr[1]["text"] and sqr[0]["text"] == sqr[2]["text"] and sqr[0]["text"] != "") or (
+                    sqr[3]["text"] == sqr[4]["text"] and sqr[3]["text"] == sqr[5]["text"] and sqr[3]["text"] != "") or (
+                    sqr[6]["text"] == sqr[7]["text"] and sqr[7]["text"] == sqr[8]["text"] and sqr[6]["text"] != "") or (
+                    sqr[0]["text"] == sqr[3]["text"] and sqr[0]["text"] == sqr[6]["text"] and sqr[0]["text"] != "") or (
+                    sqr[1]["text"] == sqr[4]["text"] and sqr[1]["text"] == sqr[7]["text"] and sqr[1]["text"] != "") or (
+                    sqr[2]["text"] == sqr[5]["text"] and sqr[5]["text"] == sqr[8]["text"] and sqr[2]["text"] != "") or (
+                    sqr[0]["text"] == sqr[4]["text"] and sqr[0]["text"] == sqr[8]["text"] and sqr[0]["text"] != "") or (
+                    sqr[2]["text"] == sqr[4]["text"] and sqr[2]["text"] == sqr[6]["text"] and sqr[2]["text"] != ""):
