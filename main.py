@@ -1,14 +1,103 @@
 import tkinter as tk
 
-# stupid window management
+""" 
+    Welcome to tic-tac-tic-tac-toe-toe
+    this is a simple game of tic-tac-toe but extended.
+    The board is made of 9 regular sized ttt squares making the global board.
+    Goal is to win the global one by winning 3 regular sized in the line.
+    The trick is the 'movement' around the board. The game starts with X playing 
+    wherever they want in any of the 81 empty spots. This move "sends" their 
+    opponent to its relative location. For example, if X played in the top right 
+    square of their local board, then O needs to play next in the local board 
+    at the top right of the global board. O can then play in any one of the nine 
+    available spots in that local board, each move sending X to a different local board.
+    Last symbol put on the board will be highlighted so the next person will know where
+    they can play theirs. If the local square you're supposed to play now is already won
+    you can choose any local square you like.
+"""
+
+
+# game window management
 root = tk.Tk()
 root.title("Tic-Tac-Toe in Tic-Tac_Toe")
-root.geometry("810x792")    # perfectly fits 81 buttons
+root.geometry("810x792")  # perfectly fits 81 buttons
+root.iconbitmap('X.ico')
 
-player = "X"    # variable for players X/O
+player = "X"  # variable for players X/O
+
+winners = ["", "", "", "", "", "", "", "", ""]  # set of strings for checking Big Win
+
+"""START WINDOW"""
+start = tk.Tk()
+start.title("")
+start.iconbitmap('X.ico')
+
+label = tk.Label(start, fg="dark green", text="Choose starting symbol")
+label.pack()
+button_O = tk.Button(start, text='O', width=25, command=lambda: change_player_and_destroy())
+button_X = tk.Button(start, text='X', width=25, command=lambda: do_not_change())
+button_O.pack()
+button_X.pack()
 
 
-winners = ["", "", "", "", "", "", "", "", ""]      # set of strings for checking Big Win
+def start_window():
+    """starting choose the symbol window"""
+    start.mainloop()
+
+
+def start_the_game():
+    """putting the buttons on their places and starting the root mainloop"""
+    column = 0
+    row = 0
+
+    for button in listOfButtons:
+        button.grid(row=row, column=column)
+        column += 1
+        if column == 9:
+            column = 0
+            row += 1
+
+    """mainloop"""
+
+    root.mainloop()
+
+
+def reset_everything(end):
+    """resetting everything after the game (if reset button pressed)"""
+    global player
+    player = "X"
+    global winners
+    clear_all_buttons()
+    winners = ["", "", "", "", "", "", "", "", ""]
+    enable_everything()
+    uncolor_last_button()
+    end.destroy()
+
+
+def remove_game():
+    """END button"""
+    root.destroy()
+
+
+def clear_all_buttons():
+    """clearing all the buttons"""
+    global listOfButtons
+    for i in listOfButtons:
+        i["text"] = ""
+
+
+def change_player_and_destroy():
+    """Changing player to O and destroying the first window (O button)"""
+    global player
+    start.destroy()
+    player = "O"
+    start_the_game()
+
+
+def do_not_change():
+    """Selecting player X and destroying the first window (X button)"""
+    start.destroy()
+    start_the_game()
 
 
 def change_player():
@@ -37,12 +126,22 @@ def enable_everything():
                 j["state"] = tk.NORMAL
 
 
+def check_draw():
+    """check for draw"""
+    check = 0
+    for i in listOfButtons:
+        if i["text"] != "":
+            check += 1
+    if check == 81:
+        end_game_window("nobody")
+
+
 def check_small_win(clicked_button):
     """Checks small win in the medium square of clicked button"""
     global listOfSqr
     for sqr in listOfSqr:
         if clicked_button in sqr:
-            """Don't we love to write all of those stupid rules by finger?"""
+            """Normal tic-tac-toe rules"""
             if (sqr[0]["text"] == sqr[1]["text"] and sqr[0]["text"] == sqr[2]["text"] and sqr[0]["text"] != "") or (
                     sqr[3]["text"] == sqr[4]["text"] and sqr[3]["text"] == sqr[5]["text"] and sqr[3]["text"] != "") or (
                     sqr[6]["text"] == sqr[7]["text"] and sqr[7]["text"] == sqr[8]["text"] and sqr[6]["text"] != "") or (
@@ -63,27 +162,28 @@ def check_small_win(clicked_button):
 
 
 def check_big_win():
-    """OH, YES! Some more stupid rules for stupid tic-tac-toe. JK I love them. We all love them.
-    Just like we love Shrek"""
+    """Normal checking for win in tic-tac-toe"""
     if winners[0] == winners[1] and winners[1] == winners[2] and winners[1] != "" or winners[0] == winners[3] and \
             winners[3] == winners[6] and winners[3] != "" or winners[0] == winners[4] and winners[4] == winners[8] and \
             winners[4] != "":
         print(f"Winner is {winners[0]}!")
-        root.destroy()
+        end_game_window(winners[0])
         quit()
     elif winners[1] == winners[4] and winners[4] == winners[7] and winners[4] != "" or winners[3] == winners[4] and \
             winners[4] == winners[5] and winners[4] != "":
         print(f"Winner is {winners[4]}!")
-        root.destroy()
+        end_game_window(winners[4])
         quit()
     elif winners[6] == winners[7] and winners[7] == winners[8] and winners[7] != "":
         print(f"Winner is {winners[7]}!")
-        root.destroy()
+        end_game_window(winners[7])
         quit()
     elif winners[2] == winners[5] and winners[5] == winners[8] and winners[5] != "":
         print(f"Winner is {winners[2]}!")
-        root.destroy()
+        end_game_window(winners[2])
         quit()
+    else:
+        check_draw()
 
 
 def enable_sqr(clicked_button):
@@ -98,14 +198,14 @@ def enable_sqr(clicked_button):
                     if j["text"] == "":
                         j["state"] = tk.NORMAL
             else:
-                "If position is indicating already won medium square it sends it to enable_everything"
+                """If position is indicating already won medium square it sends it to enable_everything"""
                 enable_everything()
 
 
 def uncolor_last_button():
-    """Changes color of the last last clicked button to default - white or green"""
+    """Changes color of the last-last clicked button to default - white or green"""
     global last_b
-    if last_b in sqrUL or last_b in sqrUR or last_b in sqrM or last_b in sqrDL or last_b in sqrDR:
+    if last_b in sqr1 or last_b in sqr3 or last_b in sqr5 or last_b in sqr7 or last_b in sqr9:
         last_b["bg"] = '#e6ffe6'
     else:
         last_b["bg"] = 'SystemButtonFace'
@@ -114,7 +214,7 @@ def uncolor_last_button():
 def button_click(clicked_button):
     """Pretty much new version of main()
     When you click a button you come here
-    Firstly de-colors the last last button clicked
+    Firstly de-colors the last-last button clicked
     Changes text on button to player - X/O
     Changes clicked button color to yellow so everyone knows where are enabled buttons
     Disables all the buttons
@@ -126,6 +226,7 @@ def button_click(clicked_button):
     """
     global last_b
     uncolor_last_button()
+    last_b = clicked_button
     clicked_button["text"] = player
     clicked_button["bg"] = '#ffff00'
     disable_everything()
@@ -133,11 +234,31 @@ def button_click(clicked_button):
     check_big_win()
     change_player()
     enable_sqr(clicked_button)
-    last_b = clicked_button
 
 
-"""Buttons. A lot of them. SO FUCKING MANY
-they are colored checkered way...? idk how to say it I'm tired
+def end_game(end):
+    """destroying end window and the root window (END button)"""
+    end.destroy()
+    root.destroy()
+
+
+def end_game_window(who_won):
+    """All setup for the end game window"""
+    end = tk.Tk()
+    end.title("")
+    end.iconbitmap('X.ico')
+
+    label_end = tk.Label(end, fg="dark green", text=f"{who_won} won!")
+    label_end.pack()
+    end_b = tk.Button(end, text='END', width=25, command=lambda: end_game(end))
+    reset_b = tk.Button(end, text='RESET', width=25, command=lambda: reset_everything(end))
+    end_b.pack()
+    reset_b.pack()
+    end.mainloop()
+
+
+"""Buttons. A lot of them
+they are colored checkered way...? 
 G G G W W W G G G
 G G G W W W G G G
 G G G W W W G G G
@@ -305,11 +426,6 @@ b80 = tk.Button(root, text='', font=('Helvetica', 20), height=2, width=5, bg='#e
 b81 = tk.Button(root, text='', font=('Helvetica', 20), height=2, width=5, bg='#e6ffe6',
                 command=lambda: button_click(b81))
 
-"""
-This is just pain...
-if anyone asks why... Tell them I don't know
-it was just pain...
-"""
 # Little squares in medium squares
 sqr1 = [b1, b2, b3, b10, b11, b12, b19, b20, b21]  # top left
 sqr2 = [b4, b5, b6, b13, b14, b15, b22, b23, b24]  # top middle
@@ -343,18 +459,7 @@ listOfButtons = [b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b1
 # List of all lists of squares depending on position
 listOfPlaces = [sqrUL, sqrU, sqrUR, sqrL, sqrM, sqrR, sqrDL, sqrD, sqrDR]
 
-last_b = b1     # setting up a last_b for coloring buttons
+last_b = b1  # setting up a last_b for coloring buttons
 
-"""This shit is just for putting buttons into their places"""
-column = 0
-row = 0
-
-for button in listOfButtons:
-    button.grid(row=row, column=column)
-    column += 1
-    if column == 9:
-        column = 0
-        row += 1
-
-"""LOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOP"""
-root.mainloop()
+# starting the first window
+start_window()
