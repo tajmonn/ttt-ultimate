@@ -13,7 +13,7 @@ import tkinter as tk
     available spots in that local board, each move sending X to a different local board.
     Last symbol put on the board will be highlighted so the next person will know where
     they can play theirs. If the local square you're supposed to play now is already won
-    you can choose any local square you like.
+    you can choose any local square you like. :)
 """
 
 
